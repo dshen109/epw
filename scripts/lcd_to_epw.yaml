@@ -1,0 +1,49 @@
+Dry Bulb Temperature:
+  source: HourlyDryBulbTemperature
+  from: degF
+  to: degC
+Dew Point Temperature:
+  source: HourlyDewPointTemperature
+  from: degF
+  to: degC
+Relative Humidity:
+  source: HourlyRelativeHumidity
+Atmospheric Station Pressure:
+  source: HourlyStationPressure
+  from: inch_Hg
+  to: Pa
+Horizontal Infrared Radiation Intensity:
+  default: 9999
+Direct Normal Radiation:
+  default: 9999
+Diffuse Horizontal Radiation:
+  default: 9999
+Wind Direction:
+  source: HourlyWindDirection
+Wind Speed:
+  source: HourlyWindSpeed
+  from: mph
+  to: m/s
+Total Sky Cover:
+  source: HourlySkyConditions
+Opaque Sky Cover:
+  # OVC:08 12 -> 10 (full coverage)
+  source: HourlySkyConditions
+Present Weather Observation:
+  default: 0
+Present Weather Codes:
+  # BR:13 (WT13) - Mist
+  # DZ:14 (WT14) - Drizzle
+  # FZDZ:15 (WT15) - Freezing drizzle
+  # RA:16 (WT16) - Rain
+  # FZRA:17 (WT17) - Freezing rain
+  # SN:18 (WT18) - Snow, snow pellets, snow grains or ice crystals
+  # UP:19 (WT19) - Unknown precipitation
+  #
+  # rain: 919999999
+  # snow: 999199999
+  source: HourlyPresentWeatherType
+Snow Depth:
+  default: 0
+Liquid Precipitation Depth:
+  default: 0
