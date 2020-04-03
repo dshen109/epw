@@ -40,8 +40,9 @@ class EPW:
         field_ordered = [list(k.keys())[0] for k in EPW_SCHEMA["fields"]]
         for i, field in enumerate(field_ordered):
             missing_default = EPW_SCHEMA["fields"][i][field].get("missing")
-            if (field not in output.columns and
-                    field != "Horizontal Infrared Radiation Intensity"):
+            # if (field not in output.columns and
+            #         field != "Horizontal Infrared Radiation Intensity"):
+            if field not in output.columns:
                 output[field] = missing_default
                 print("Filled {} column with missing value of {}"
                       .format(field, missing_default))
@@ -74,11 +75,11 @@ class EPW:
                             "Filled {} over values in {} with "
                             "missing value of {}"
                             .format(numover, field, missing_default))
-        output["Horizontal Infrared Radiation Intensity"] = \
-            self.calc_horizontal_infrared_radiation(
-                output["Dry Bulb Temperature"] + 273.15,
-                output["Dew Point Temperature"] + 273.15,
-                output["Opaque Sky Cover"])
+        # output["Horizontal Infrared Radiation Intensity"] = \
+        #     self.calc_horizontal_infrared_radiation(
+        #         output["Dry Bulb Temperature"] + 273.15,
+        #         output["Dew Point Temperature"] + 273.15,
+        #         output["Opaque Sky Cover"])
 
         output["Present Weather Codes"] = \
             output["Present Weather Codes"].astype(int)
