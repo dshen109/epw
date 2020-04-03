@@ -4,6 +4,7 @@ Convert NOAA files to EPW files.
 
 import os
 
+import numpy as np
 import pandas as pd
 import pint
 import yaml
@@ -39,7 +40,8 @@ class EPW:
         field_ordered = [list(k.keys())[0] for k in EPW_SCHEMA["fields"]]
         for i, field in enumerate(field_ordered):
             missing_default = EPW_SCHEMA["fields"][i][field].get("missing")
-            if field not in output.columns:
+            if (field not in output.columns and
+                    field != "Horizontal Infrared Radiation Intensity"):
                 output[field] = missing_default
                 print("Filled {} column with missing value of {}"
                       .format(field, missing_default))
@@ -72,7 +74,31 @@ class EPW:
                             "Filled {} over values in {} with "
                             "missing value of {}"
                             .format(numover, field, missing_default))
+        output["Horizontal Infrared Radiation Intensity"] = \
+            self.calc_horizontal_infrared_radiation(
+                output["Dry Bulb Temperature"] + 273.15,
+                output["Dew Point Temperature"] + 273.15,
+                output["Opaque Sky Cover"])
+
+        output["Present Weather Codes"] = \
+            output["Present Weather Codes"].astype(int)
         output[field_ordered].to_csv(filename, index=False, header=False)
+
+    @staticmethod
+    def calc_horizontal_infrared_radiation(
+            drybulb, dewpoint, opaque_sky_cover):
+        """
+        :param drybulb: Drybulb temperautre in Kelvin
+        :param dewpoint: Dewpoint temperature in Kelvin
+        :param opaque_sky_cover: Sky cover in tenths
+        """
+        emissivity = (
+            (0.787 + 0.764 * np.log(dewpoint / 273)) * (
+                1 + 0.0224 * opaque_sky_cover +
+                0.0035 * opaque_sky_cover ** 2 +
+                0.00028 * opaque_sky_cover ** 3))
+        boltzmann = 5.6697e-8
+        return emissivity * boltzmann * drybulb
 
 
 class NOAAData:
@@ -182,6 +208,6 @@ def prepend_lines_from_epw(file_name, epw_file):
 
 if __name__ == "__main__":
     noaa = NOAAData.load_csv("chicago_ohare_2019.csv")
-    epw = noaa.to_epw("60T")
+    epw = noaa.to_epw("5T")
     epw.write("test.epw")
     prepend_lines_from_epw("test.epw", "chicago_midway.epw")

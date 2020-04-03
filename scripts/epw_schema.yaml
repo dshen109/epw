@@ -12,7 +12,7 @@ fields:
       required: true
   - Data Source and Uncertainty Flags:
       required: true
-      missing: "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9"
+      missing: "?9?9?9?9E0?9?9?9*9*9?9?9?9*_?9?9*9*9*9*_*9*9"
   - Dry Bulb Temperature:
       required: true
       min: -70
@@ -129,3 +129,4 @@ fields:
       missing: 1.5
   - Liquid Precipitation Quantity:
       required: false
+      missing: 1
