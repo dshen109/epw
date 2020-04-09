@@ -91,7 +91,7 @@
     12,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
-    Sunday,                  !- Day of Week for Start Day
+    Tuesday,                  !- Day of Week for Start Day
     No,                      !- Use Weather File Holidays and Special Days
     No,                      !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
@@ -237,7 +237,7 @@
     7,                       !- Calculation Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
-  Timestep,6;
+  Timestep, 12;
 
 ! WeatherFileName=USA_IL_Chicago-OHare_TMY2.epw
 
@@ -9375,37 +9375,37 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-  Output:Meter,Electricity:Facility,hourly;
+  Output:Meter,Electricity:Facility,Timestep;
 
-  Output:Meter,Heating:Electricity,hourly;
+  Output:Meter,Heating:Electricity,Timestep;
 
-  Output:Meter,Cooling:Electricity,hourly;
+  Output:Meter,Cooling:Electricity,Timestep;
 
-  Output:Meter,InteriorLights:Electricity,hourly;
+  Output:Meter,InteriorLights:Electricity,Timestep;
 
-  Output:Meter,ExteriorLights:Electricity,hourly;
+  Output:Meter,ExteriorLights:Electricity,Timestep;
 
-  Output:Meter,InteriorEquipment:Electricity,hourly;
+  Output:Meter,InteriorEquipment:Electricity,Timestep;
 
-  Output:Meter,ExteriorEquipment:Electricity,hourly;
+  Output:Meter,ExteriorEquipment:Electricity,Timestep;
 
-  Output:Meter,Fans:Electricity,hourly;
+  Output:Meter,Fans:Electricity,Timestep;
 
-  Output:Meter,Pumps:Electricity,hourly;
+  Output:Meter,Pumps:Electricity,Timestep;
 
-  Output:Meter,HeatRejection:Electricity,hourly;
+  Output:Meter,HeatRejection:Electricity,Timestep;
 
-  Output:Meter,Humidifier:Electricity,hourly;
+  Output:Meter,Humidifier:Electricity,Timestep;
 
-  Output:Meter,Refrigeration:Electricity,hourly;
+  Output:Meter,Refrigeration:Electricity,Timestep;
 
-  Output:Meter,WaterSystems:Electricity,hourly;
+  Output:Meter,WaterSystems:Electricity,Timestep;
 
-  Output:Meter,Gas:Facility,hourly;
+  Output:Meter,Gas:Facility,Timestep;
 
-  Output:Meter,Heating:Gas,hourly;
+  Output:Meter,Heating:Gas,Timestep;
 
-  Output:Meter,InteriorEquipment:Gas,hourly;
+  Output:Meter,InteriorEquipment:Gas,Timestep;
 
-  Output:Meter,WaterSystems:Gas,hourly;
+  Output:Meter,WaterSystems:Gas,Timestep;
 
