@@ -1,3 +1,15 @@
+# EPW files
+*.audit
+*.bnd
+*.eio
+*.end
+*.err
+*.eso
+*.mtd
+*.mtr
+*.shd
+*.sql
+
 .idea/
 
 # Byte-compiled / optimized / DLL files
