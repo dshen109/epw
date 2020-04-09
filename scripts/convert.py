@@ -75,11 +75,11 @@ class EPW:
                             "Filled {} over values in {} with "
                             "missing value of {}"
                             .format(numover, field, missing_default))
-        # output["Horizontal Infrared Radiation Intensity"] = \
-        #     self.calc_horizontal_infrared_radiation(
-        #         output["Dry Bulb Temperature"] + 273.15,
-        #         output["Dew Point Temperature"] + 273.15,
-        #         output["Opaque Sky Cover"])
+        output["Horizontal Infrared Radiation Intensity"] = \
+            self.calc_horizontal_infrared_radiation(
+                output["Dry Bulb Temperature"] + 273.15,
+                output["Dew Point Temperature"] + 273.15,
+                output["Opaque Sky Cover"])
 
         output["Present Weather Codes"] = \
             output["Present Weather Codes"].astype(int)
@@ -209,6 +209,6 @@ def prepend_lines_from_epw(file_name, epw_file):
 
 if __name__ == "__main__":
     noaa = NOAAData.load_csv("chicago_ohare_2019.csv")
-    epw = noaa.to_epw("5T")
+    epw = noaa.to_epw("60T")
     epw.write("test.epw")
     prepend_lines_from_epw("test.epw", "chicago_midway.epw")
