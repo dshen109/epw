@@ -1,3 +1,4 @@
+# Schema for converting local climatalogial data to EPW
 Dry Bulb Temperature:
   source: HourlyDryBulbTemperature
   from: degF

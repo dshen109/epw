@@ -13,16 +13,21 @@ fields:
   - Data Source and Uncertainty Flags:
       required: true
       missing: "?9?9?9?9E0?9?9?9*9*9?9?9?9*_?9?9*9*9*9*_*9*9"
+      type: string  # type assumed to be int unless specified.
   - Dry Bulb Temperature:
       required: true
       min: -70
       max: 70
       missing: 99.9
+      type: float
+      decimals: 1
   - Dew Point Temperature:
       required: true
       min: -70
       max: 70
       missing: 99.9
+      type: float
+      decimals: 1
   - Relative Humidity:
       required: true
       min: 0
@@ -45,6 +50,8 @@ fields:
       required: true
       min: 0
       missing: 9999
+      type: float
+      decimals: 7
   - Global Horizontal Radiation:
       required: false
       min: 0
@@ -86,6 +93,8 @@ fields:
       min: 0
       max: 40
       missing: 999
+      type: float
+      decimals: 1
   - Total Sky Cover:
       required: true
       min: 0

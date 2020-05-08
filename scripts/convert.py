@@ -2,6 +2,7 @@
 Convert NOAA files to EPW files.
 """
 
+from collections import OrderedDict
 import os
 
 import numpy as np
@@ -13,7 +14,12 @@ UREG = pint.UnitRegistry()
 
 
 with open("epw_schema.yaml", "r") as f:
-    EPW_SCHEMA = yaml.load(f)
+    epw_schema = yaml.load(f)
+    EPW_SCHEMA = OrderedDict()
+    for item in epw_schema["fields"]:
+        k = list(item.keys())[0]
+        EPW_SCHEMA[k] = item[k]
+
 
 with open("lcd_to_epw.yaml", "r") as f:
     LCD_TO_EPW_SCHEMA = yaml.load(f)
@@ -21,6 +27,8 @@ with open("lcd_to_epw.yaml", "r") as f:
 RAIN = 919999999
 SNOW = 999199999
 DRY = 999999999
+
+TZ_LOCAL = "America/Chicago"
 
 
 class EPW:
@@ -37,11 +45,10 @@ class EPW:
     def write(self, filename):
         """ Write to a file. """
         output = self.frame.copy()
-        field_ordered = [list(k.keys())[0] for k in EPW_SCHEMA["fields"]]
-        for i, field in enumerate(field_ordered):
-            missing_default = EPW_SCHEMA["fields"][i][field].get("missing")
-            # if (field not in output.columns and
-            #         field != "Horizontal Infrared Radiation Intensity"):
+        field_ordered = [k for k in EPW_SCHEMA.keys()]
+        for field, params in EPW_SCHEMA.items():
+            missing_default = params.get("missing")
+
             if field not in output.columns:
                 output[field] = missing_default
                 print("Filled {} column with missing value of {}"
@@ -54,8 +61,8 @@ class EPW:
                     print(
                         "Filled {} nan values in {} with missing value of {}"
                         .format(numnan, field, missing_default))
-                minimum = EPW_SCHEMA["fields"][i][field].get("min")
-                maximum = EPW_SCHEMA["fields"][i][field].get("max")
+                minimum = params.get("min")
+                maximum = params.get("max")
                 if minimum is not None:
                     under = (
                         (output[field] < minimum) & ~output[field].isna())
@@ -81,8 +88,12 @@ class EPW:
                 output["Dew Point Temperature"] + 273.15,
                 output["Opaque Sky Cover"])
 
-        output["Present Weather Codes"] = \
-            output["Present Weather Codes"].astype(int)
+        for field, params in EPW_SCHEMA.items():
+            output[field] = output[field].astype(params.get("type", "int"))
+            if params.get("type") == "float":
+                output[field] = round(output[field], params.get("decimals", 1))
+            output[field] = output[field].astype(str)
+
         output[field_ordered].to_csv(filename, index=False, header=False)
 
     @staticmethod
@@ -118,6 +129,7 @@ class NOAAData:
         """ Load a NOAA file from csv. """
         weather = pd.read_csv(
             filename, index_col=1, parse_dates=True)
+        weather = weather.tz_localize("UTC")
         weather.dropna(how="all", axis=1, inplace=True)
         return cls(weather)
 
@@ -131,8 +143,9 @@ class NOAAData:
         """
         Convert into an EPW file.
         """
-        output = pd.DataFrame()
         frame = self.frame.copy().resample(interval).first()
+        frame = frame.tz_convert(TZ_LOCAL)
+        output = pd.DataFrame()
         # Convert columns.
         for epw_col, details in LCD_TO_EPW_SCHEMA.items():
             print("Handling column: {}".format(epw_col))
@@ -209,6 +222,6 @@ def prepend_lines_from_epw(file_name, epw_file):
 
 if __name__ == "__main__":
     noaa = NOAAData.load_csv("chicago_ohare_2019.csv")
-    epw = noaa.to_epw("60T")
-    epw.write("test.epw")
-    prepend_lines_from_epw("test.epw", "chicago_midway.epw")
+    epw = noaa.to_epw("1T")
+    epw.write("chicago_1m.epw")
+    prepend_lines_from_epw("chicago_1m.epw", "chicago_midway.epw")

@@ -1,0 +1,1 @@
+energyplus -d tmp -w chicago_1m.epw -d tmp large_office_post_1980_chicago_ohare.idf ; cat tmp/eplusout.err
