@@ -43,7 +43,7 @@ class EPW:
         pass
 
     def write(self, filename):
-        """ Write to a file. """
+        """ Write to a file.  """
         output = self.frame.copy()
         field_ordered = [k for k in EPW_SCHEMA.keys()]
         for field, params in EPW_SCHEMA.items():
@@ -126,7 +126,7 @@ class NOAAData:
 
     @classmethod
     def load_csv(cls, filename):
-        """ Load a NOAA file from csv. """
+        """ Load a NOAA file from csv. Assumes timestamps are in UTC. """
         weather = pd.read_csv(
             filename, index_col=1, parse_dates=True)
         weather = weather.tz_localize("UTC")
@@ -139,12 +139,19 @@ class NOAAData:
         data = pd.read_pickle(filename)
         return cls(data)
 
-    def to_epw(self, interval="5T"):
+    def to_epw(self, interval="5T", start="", end=""):
         """
-        Convert into an EPW file.
+        Convert into an EPW file. Start and end are in local timestamps.
         """
         frame = self.frame.copy().resample(interval).first()
+
         frame = frame.tz_convert(TZ_LOCAL)
+
+        if start:
+            frame = frame.loc[start:]
+        if end:
+            frame = frame.loc[:end]
+
         output = pd.DataFrame()
         # Convert columns.
         for epw_col, details in LCD_TO_EPW_SCHEMA.items():
@@ -181,10 +188,15 @@ class NOAAData:
                     unit_to = UREG(details["to"])
                     source = (source * unit_from).to(unit_to).magnitude
                 output[epw_col] = source
+            # Interpolate up to 60 minutes of data.
+            interp_limit = 60 * 60 / pd.to_timedelta(interval).total_seconds()
+            interp_limit = int(interp_limit)
             if numeric:
-                output[epw_col] = output[epw_col].interpolate(limit=15)
+                output[epw_col] = output[epw_col].interpolate(
+                    limit=interp_limit)
             else:
-                output[epw_col] = output[epw_col].interpolate("pad", limit=15)
+                output[epw_col] = output[epw_col].interpolate(
+                    "pad", limit=interp_limit)
 
             print(
                 "Average value of {}: {}"
@@ -221,7 +233,10 @@ def prepend_lines_from_epw(file_name, epw_file):
 
 
 if __name__ == "__main__":
-    noaa = NOAAData.load_csv("chicago_ohare_2019.csv")
-    epw = noaa.to_epw("1T")
-    epw.write("chicago_1m.epw")
-    prepend_lines_from_epw("chicago_1m.epw", "chicago_midway.epw")
+    epw_out = "chicago_5m_complete.epw"
+    freq = "5T"
+
+    noaa = NOAAData.load_csv("chicago_ohare_2019_complete.csv")
+    epw = noaa.to_epw(freq, "2019-01-01 00:00", "2019-12-31 23:59:59")
+    epw.write(epw_out)
+    prepend_lines_from_epw(epw_out, "chicago_midway.epw")
